@@ -1,9 +1,8 @@
 FROM ubuntu:latest
-MAINTAINER Daniel Zohar <daniel@memrise.com>
+MAINTAINER schnie <greg@astronomer.io>
 
-RUN apt-get update && apt-get install -y libmysqlclient-dev python-dev python-setuptools build-essential libpq-dev
-RUN easy_install -U pip
-RUN pip install airflow[s3]==1.1.1 && pip install airflow[mysql]==1.1.1 && pip install airflow[postgres]==1.1.1
+RUN apt-get update && apt-get install -y python2.7-dev python-pip python-setuptools build-essential libpq-dev
+RUN pip install airflow==1.7.0
 
 ENV AIRFLOW_HOME /airflow
 WORKDIR /airflow
