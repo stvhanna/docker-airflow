@@ -1,0 +1,5 @@
+pydash==3.4.3
+pymongo==3.2.2
+stringcase==1.0.6
+fn==0.4.3
+docker-py==1.8.1
