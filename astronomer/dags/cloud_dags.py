@@ -5,11 +5,15 @@ from fn.func import F
 import stringcase as case
 import pymongo
 import json
+import os
+
+now = datetime.utcnow() - timedelta(days=1)
+start_date = datetime(now.year, now.month, now.day)
 
 default_args = {
-    'owner': 'schnie',
+    'owner': 'astronomer',
     'depends_on_past': True,
-    'start_date': datetime(2016, 5, 4),
+    'start_date': start_date,
     'email': 'greg@astronomer.io',
     'email_on_failure': False,
     'email_on_retry': False,
@@ -17,11 +21,12 @@ default_args = {
     'retry_delay': timedelta(minutes=5),
 }
 
+# Pass some env vars through.
 env = {
-    'AWS_ACCESS_KEY_ID': 'AKIAILGTIA5SRLTJTXWQ',
-    'AWS_SECRET_ACCESS_KEY': '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',
-    'AWS_REGION': 'us-east-1',
-    'AWS_S3_TEMP_BUCKET': 'astronomer-workflows',
+    'AWS_ACCESS_KEY_ID': os.getenv('AWS_ACCESS_KEY_ID', ''),
+    'AWS_SECRET_ACCESS_KEY': os.getenv('AWS_SECRET_ACCESS_KEY', ''),
+    'AWS_REGION': os.getenv('AWS_REGION', ''),
+    'AWS_S3_TEMP_BUCKET': os.getenv('AWS_S3_TEMP_BUCKET', '')
 }
 
 # Trim aries-activity- off.
@@ -41,9 +46,6 @@ def create_task(dag, activity_list, (index, activity)):
         '{{ params.config }}'
         '{{ ts }}'
     """
-
-    # Dummy activityTask
-    activity_task = '{}'
 
     # Get config.
     config = json.dumps(activity['config'] if 'config' in activity else {})
@@ -68,17 +70,26 @@ def create_task(dag, activity_list, (index, activity)):
         dag=dag)
 
 
+# Get mongo url.
+mongo_url = os.getenv('MONGO_URL', '')
+
 # Connect to mongo.
-client = pymongo.MongoClient('localhost', 3001)
+client = pymongo.MongoClient(mongo_url)
 
 # Query for all workflows.
-# XXX: REMOVE ME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-for workflow in client.meteor.workflows.find({ '_id': 'TNWMS3WjdSuLtXqEr' }):
+for workflow in client.get_default_database().workflows.find({ 'name': { '$exists': True } }):
     # Get the workflow id.
     workflow_id = workflow['_id']
 
-    # Get the name of the workflow, fallback to id if missing.
-    name = workflow['name'] if 'name' in workflow else workflow_id
+    # Get the name of the workflow.
+    name = workflow['name']
+
+    # Legacy.
+    interval = timedelta(seconds=workflow['interval']) if 'interval' in workflow else None
+    # New.
+    schedule = workflow['schedule'] if 'schedule' in workflow else '@daily'
+    # Figure out which one to use.
+    schedule_interval = schedule if schedule is not None else interval
 
     # Lower and snake case the name or id.
     formattedName = case.snakecase(case.lowercase(name))
@@ -88,8 +99,9 @@ for workflow in client.meteor.workflows.find({ '_id': 'TNWMS3WjdSuLtXqEr' }):
     dag = globals()[workflow_id] = DAG(
         formattedName,
         default_args=default_args,
-        schedule_interval=timedelta(1))
+        schedule_interval=schedule_interval)
 
+    # Grab activity list.
     activity_list = workflow['activityList']
 
     # List to hold activities to setup dependencies after creation.
