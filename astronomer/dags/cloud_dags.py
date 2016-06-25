@@ -85,7 +85,7 @@ for workflow in client.get_default_database().workflows.find({ 'name': { '$exist
     name = workflow['name']
 
     # Legacy.
-    interval = timedelta(seconds=workflow['interval']) if 'interval' in workflow else None
+    interval = timedelta(seconds=int(workflow['interval'])) if 'interval' in workflow else None
     # New.
     schedule = workflow['schedule'] if 'schedule' in workflow else '@daily'
     # Figure out which one to use.
