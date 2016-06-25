@@ -3,7 +3,7 @@ MAINTAINER schnie <greg@astronomer.io>
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF
 RUN echo "deb http://repos.mesosphere.com/ubuntu vivid main" | tee /etc/apt/sources.list.d/mesosphere.list
-RUN apt-get update && apt-get install -y mesos python-dev python-setuptools build-essential libpq-dev dnsutils
+RUN apt-get update && apt-get install -y mesos python-dev python-setuptools build-essential libpq-dev dnsutils netcat
 RUN easy_install pip
 RUN pip install protobuf psycopg2 airflow==1.7.1.3
 
