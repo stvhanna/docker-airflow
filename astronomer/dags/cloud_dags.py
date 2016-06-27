@@ -67,6 +67,7 @@ def create_task(dag, activity_list, (index, activity)):
         command=command,
         params=params,
         xcom_push=True,
+        force_pull=True,
         dag=dag)
 
 
