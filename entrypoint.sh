@@ -29,7 +29,7 @@ if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ]; then
             exit 1
         fi
         echo "$(date) - waiting for ${HOST}... $i/$CONN_ATTEMPTS"
-        sleep 5
+        sleep 10
     done
 
     # Ensure db initialized.
