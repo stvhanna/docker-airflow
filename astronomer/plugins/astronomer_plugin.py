@@ -138,8 +138,8 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
 
                 # ASTRONOMER #
                 conn = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN', '')
-                docker_run = "docker run -h $(hostname) -v /airflow/logs:/airflow/logs -v /var/run/docker.sock:/var/run/docker.sock -e 'AIRFLOW__CORE__SQL_ALCHEMY_CONN={conn}' astronomerio/airflow".format(conn=conn)
-                docker_cmd = re.sub('^([\w]+)', docker_run, cmd)
+                docker_cmd = "docker run -h $(hostname) -v /airflow/logs:/airflow/logs -v /var/run/docker.sock:/var/run/docker.sock -e 'AIRFLOW__CORE__SQL_ALCHEMY_CONN={conn}' astronomerio/airflow {cmd}".format(conn=conn, cmd=cmd)
+                # docker_cmd = re.sub('^([\w]+)', docker_run, cmd)
                 # ASTRONOMER #
 
                 command = mesos_pb2.CommandInfo()

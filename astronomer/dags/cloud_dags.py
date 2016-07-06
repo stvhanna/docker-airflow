@@ -75,20 +75,27 @@ def create_task(dag, activity_list, (index, activity)):
 mongo_url = os.getenv('MONGO_URL', '')
 
 # Connect to mongo.
+print('Connecting to mongodb.')
 client = pymongo.MongoClient(mongo_url)
 
 # Query for all workflows.
-for workflow in client.get_default_database().workflows.find({ 'name': { '$exists': True } }):
+print('Querying for cloud workflows.')
+workflows = client.get_default_database().workflows.find({ 'name': { '$exists': True } })
+
+print('Found {count} workflows.'.format(count=workflows.count()))
+for workflow in workflows:
     # Get the workflow id.
     workflow_id = workflow['_id']
 
     # Get the name of the workflow.
     name = workflow['name']
 
+    print('Building DAG: {name}.').format(name=name)
+
     # Legacy.
     interval = timedelta(seconds=int(workflow['interval'])) if 'interval' in workflow else None
     # New.
-    schedule = workflow['schedule'] if 'schedule' in workflow else '@daily'
+    schedule = workflow['schedule'] if 'schedule' in workflow else None
     # Figure out which one to use.
     schedule_interval = schedule if schedule is not None else interval
 
@@ -112,3 +119,6 @@ for workflow in client.get_default_database().workflows.find({ 'name': { '$exist
     # TODO: Support `dependsOn` for full blown dags in mongo.
     for i, current in enumerate(tasks):
         if (i > 0): current.set_upstream(tasks[i - 1])
+
+client.close()
+print('Finished exporting DAG\'s.')

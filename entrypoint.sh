@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-CMD="airflow"
 CONN_ATTEMPTS=10
 
 # Configure airflow with postgres connection string.
@@ -15,8 +14,9 @@ if [ -v AIRFLOW_POSTGRES_HOST ] && [ -v AIRFLOW_POSTGRES_USER ] && [ -v AIRFLOW_
     export AIRFLOW__CORE__SQL_ALCHEMY_CONN=$CONN
 fi
 
-# Wait for postgres then init the db.
-if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ]; then
+if [ -v AIRFLOW__CORE__SQL_ALCHEMY_CONN ]; then
+    # Wait for postgres then init the db.
+    # if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ]; then
     HOST=`echo $AIRFLOW__CORE__SQL_ALCHEMY_CONN | awk -F@ '{print $2}'`
     FORMATTED_HOST=`echo $HOST | tr ":" " "`
     CHECK_HOST="nc -z ${FORMATTED_HOST}"
@@ -33,18 +33,15 @@ if [ "$1" = "webserver" ] || [ "$1" = "worker" ] || [ "$1" = "scheduler" ]; then
     done
 
     # Ensure db initialized.
-    if [ "$1" = "webserver" ]; then
+    if [[ "$3" == *"webserver"* ]]; then
         echo "Initializing airflow postgres db..."
-        $CMD initdb
+        airflow initdb
     fi
 
-    # Give initdb some time to run.
-    echo "Waiting for airflow database to be initialized..."
+    echo "Ensuring database..."
     sleep 5
 fi
 
-
 # Run the `airflow` command.
-COMMAND="$CMD $@"
-echo "Executing: $COMMAND"
-exec $COMMAND
+echo "Executing: $@"
+exec $@
