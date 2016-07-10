@@ -1,3 +1,4 @@
+# TODO: Move to alpine base, or at least debian.
 FROM ubuntu:15.04
 MAINTAINER schnie <greg@astronomer.io>
 
@@ -8,7 +9,11 @@ RUN easy_install pip
 # RUN pip install protobuf psycopg2 airflow==1.7.1.3
 RUN pip install protobuf psycopg2
 
-RUN pip install -e git+https://github.com/apache/incubator-airflow.git@1.7.1.3#egg=airflow
+# RUN pip install -e git+https://github.com/apache/incubator-airflow.git@master#egg=airflow
+# RUN pip install -e git+https://github.com/apache/incubator-airflow.git@1.7.1.3#egg=airflow
+
+COPY incubator-airflow /incubator-airflow
+RUN pip install -e /incubator-airflow
 
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python2.7/site-packages/
 

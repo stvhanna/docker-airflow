@@ -136,17 +136,45 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
                 mem.type = mesos_pb2.Value.SCALAR
                 mem.scalar.value = self.task_mem
 
+                container = mesos_pb2.ContainerInfo()
+                container.type = 1 # mesos_pb2.ContainerInfo.Type.DOCKER
+
+                volume = container.volumes.add()
+                volume.host_path = "/airflow/logs"
+                volume.container_path = "/airflow/logs"
+                volume.mode = 1 # mesos_pb2.Volume.Mode.RW
+
+                volume = container.volumes.add()
+                volume.host_path = "/var/run/docker.sock"
+                volume.container_path = "/var/run/docker.sock"
+                volume.mode = 1 # mesos_pb2.Volume.Mode.RW
+
+                docker = mesos_pb2.ContainerInfo.DockerInfo()
+                docker.image = "astronomerio/airflow"
+                docker.force_pull_image = True
+
+                container.docker.MergeFrom(docker)
+                task.container.MergeFrom(container)
+
                 # ASTRONOMER #
                 conn = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN', '')
-                docker_cmd = "docker run -h $(hostname) -v /airflow/logs:/airflow/logs -v /var/run/docker.sock:/var/run/docker.sock -e 'AIRFLOW__CORE__SQL_ALCHEMY_CONN={conn}' astronomerio/airflow {cmd}".format(conn=conn, cmd=cmd)
+                # docker_cmd = "docker run -h $(hostname)
+                # -v /airflow/logs:/airflow/logs
+                # -v /var/run/docker.sock:/var/run/docker.sock
+                # -e 'AIRFLOW__CORE__SQL_ALCHEMY_CONN={conn}' astronomerio/airflow {cmd}".format(conn=conn, cmd=cmd)
+
                 # docker_cmd = re.sub('^([\w]+)', docker_run, cmd)
                 # ASTRONOMER #
 
                 command = mesos_pb2.CommandInfo()
-                command.shell = True
-                command.value = docker_cmd
-                task.command.MergeFrom(command)
+                # command.shell = True
+                command.value = cmd
 
+                environment = command.environment.variables.add()
+                environment.name = "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
+                environment.value = conn
+
+                task.command.MergeFrom(command)
                 tasks.append(task)
 
                 remainingCpus -= self.task_cpu
@@ -283,4 +311,4 @@ class AstronomerMesosExecutor(BaseExecutor):
 
 class AstronomerPlugin(AirflowPlugin):
     name = 'astronomer_plugin'
-    executors=[AstronomerMesosExecutor]
+    executors = [AstronomerMesosExecutor]
