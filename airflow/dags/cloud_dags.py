@@ -38,11 +38,13 @@ def create_task(dag, activity_list, (index, activity)):
     # This is to mimic original aries functionality.
     # This will probably be replaced with using sensors.
     previous_task = activity_list[index - 1] if index > 0 else None
-    previous_task_name = trim_activity_name(previous_task['name']) if previous_task else ''
+    previous_task_id = (
+            '{index}_{name}'.format(index=index-1, name=trim_activity_name(previous_task['name'])) if previous_task
+            else '')
 
     # Template out a command.
     command = """
-        '{{ task_instance.xcom_pull(task_ids=params.previous_task_name) }}'
+        '{{ task_instance.xcom_pull(task_ids=params.previous_task_id) }}'
         '{{ params.config }}'
         '{{ ts }}'
     """
@@ -51,17 +53,22 @@ def create_task(dag, activity_list, (index, activity)):
     config = json.dumps(activity['config'] if 'config' in activity else {})
 
     # The params for the command.
-    params = { 'config': config, 'previous_task_name': previous_task_name }
+    params = { 'config': config, 'previous_task_id': previous_task_id }
 
     # Get the activity name.
     activity_name = trim_activity_name(activity['name'])
+
+    # Create task id.
+    task_id = '{index}_{name}'.format(
+            index=index,
+            name=trim_activity_name(activity['name']))
 
     # Prefix with our docker hub username.
     image_name = 'astronomerio/' + activity_name
 
     # Return a new docker operator with our command.
     return DockerOperator(
-        task_id=activity_name,
+        task_id=task_id,
         image=image_name,
         environment=env,
         command=command,
@@ -80,7 +87,7 @@ client = pymongo.MongoClient(mongo_url)
 
 # Query for all workflows.
 print('Querying for cloud workflows.')
-workflows = client.get_default_database().workflows.find({ 'name': { '$exists': True } })
+workflows = client.get_default_database().workflows.find({ '_airflow': True })
 
 print('Found {count} workflows.'.format(count=workflows.count()))
 for workflow in workflows:
@@ -88,7 +95,12 @@ for workflow in workflows:
     workflow_id = workflow['_id']
 
     # Get the name of the workflow.
-    name = workflow['name']
+    workflow_name = workflow['name'] if 'name' in workflow else None
+
+    # Lower and snake case the name if we have one, else just id.
+    name = workflow_id if not workflow_name else '{id}__{name}'.format(
+        id=workflow_id,
+        name=case.snakecase(case.lowercase(workflow_name)))
 
     print('Building DAG: {name}.').format(name=name)
 
@@ -99,13 +111,10 @@ for workflow in workflows:
     # Figure out which one to use.
     schedule_interval = schedule if schedule is not None else interval
 
-    # Lower and snake case the name or id.
-    formattedName = case.snakecase(case.lowercase(name))
-
     # Airflow looks at module globals for DAGs, so assign each workflow to
     # a global variable using it's id.
     dag = globals()[workflow_id] = DAG(
-        formattedName,
+        name,
         default_args=default_args,
         schedule_interval=schedule_interval)
 
