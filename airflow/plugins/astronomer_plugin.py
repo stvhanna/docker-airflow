@@ -44,7 +44,7 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
                  task_queue,
                  result_queue,
                  task_cpu=1,
-                 task_mem=256):
+                 task_mem=512):
         self.task_queue = task_queue
         self.result_queue = result_queue
         self.task_cpu = task_cpu
