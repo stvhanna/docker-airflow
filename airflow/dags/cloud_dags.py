@@ -7,7 +7,7 @@ import pymongo
 import json
 import os
 
-now = datetime.utcnow() - timedelta(days=1)
+now = datetime.utcnow() - timedelta(hours=1)
 start_date = datetime(now.year, now.month, now.day)
 
 default_args = {
@@ -98,7 +98,7 @@ for workflow in workflows:
     workflow_name = workflow['name'] if 'name' in workflow else None
 
     # Lower and snake case the name if we have one, else just id.
-    name = workflow_id if not workflow_name else '{id}__{name}'.format(
+    name = workflow_id if not workflow_name else '{name}__etl__{id}'.format(
         id=workflow_id,
         name=case.snakecase(case.lowercase(workflow_name)))
 
@@ -130,4 +130,4 @@ for workflow in workflows:
         if (i > 0): current.set_upstream(tasks[i - 1])
 
 client.close()
-print('Finished exporting DAG\'s.')
+print('Finished exporting ETL DAG\'s.')
