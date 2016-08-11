@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-CONN_ATTEMPTS=10
+CONN_ATTEMPTS=50
 
 # Configure airflow with postgres connection string.
 if [ -v AIRFLOW_POSTGRES_HOST ] && [ -v AIRFLOW_POSTGRES_USER ] && [ -v AIRFLOW_POSTGRES_PASSWORD ]; then
