@@ -32,12 +32,13 @@ RUN set -ex \
         build-essential \
         libblas-dev \
         liblapack-dev \
+        git \
     ' \
     && apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF \
     && echo "deb http://repos.mesosphere.com/ubuntu vivid main" > /etc/apt/sources.list.d/mesosphere.list \
     && echo "deb http://http.debian.net/debian jessie-backports main" > /etc/apt/sources.list.d/backports.list \
     && apt-get update -yqq \
-    && apt-get install -yqq --no-install-recommends \
+    && apt-get install -yqq --no-install-recommends --fix-missing \
         $buildDeps \
         apt-utils \
         curl \
@@ -56,14 +57,22 @@ RUN set -ex \
     && pip install pyOpenSSL \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
-    && pip install psycopg2 \
     && pip install protobuf \
     && pip install pydash==3.4.3 \
     && pip install pymongo==3.2.2 \
     && pip install stringcase==1.0.6 \
     && pip install fn==0.4.3 \
     && pip install docker-py==1.8.1 \
-    && pip install -e /incubator-airflow \
+
+    # Should be installed using airlow extra requirements
+    # via pip install airflow[s3,postgres], but can't get it to work
+    # with editable install. These are pulled from airflow setup.py.
+    && pip install psycopg2>=2.6 \
+    && pip install boto>=2.36.0 \
+    && pip install filechunkio>=1.6 \
+
+    && pip install git+https://github.com/astronomerio/incubator-airflow@logging-fix#egg=incubator-airflow \
+    # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
     && apt-get remove --purge -yqq $buildDeps libpq-dev \
     && apt-get clean \
