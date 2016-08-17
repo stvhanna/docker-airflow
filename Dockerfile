@@ -17,9 +17,6 @@ ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
 ENV LC_ALL  en_US.UTF-8
 
-# Add local source.
-ADD incubator-airflow /incubator-airflow
-
 # Install dependencies.
 RUN set -ex \
     && buildDeps=' \
