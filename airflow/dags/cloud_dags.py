@@ -69,7 +69,6 @@ def create_task(dag, activity_list, (index, activity)):
 
     # Force pull in prod, use local in dev.
     force_pull = ast.literal_eval(os.getenv('FORCE_PULL_TASK_IMAGES', 'True'))
-    print 'FORCE_PULL_TASK_IMAGES: %s' % force_pull
 
     # Return a new docker operator with our command.
     return DockerOperator(
