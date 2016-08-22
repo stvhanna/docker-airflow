@@ -2,6 +2,7 @@ from airflow import DAG
 from airflow.operators.docker_operator import DockerOperator
 from datetime import datetime, timedelta
 from fn.func import F
+import ast
 import stringcase as case
 import pymongo
 import json
@@ -66,6 +67,10 @@ def create_task(dag, activity_list, (index, activity)):
     # Prefix with our docker hub username.
     image_name = 'astronomerio/' + activity_name
 
+    # Force pull in prod, use local in dev.
+    force_pull = ast.literal_eval(os.getenv('FORCE_PULL_TASK_IMAGES', 'True'))
+    print 'FORCE_PULL_TASK_IMAGES: %s' % force_pull
+
     # Return a new docker operator with our command.
     return DockerOperator(
         task_id=task_id,
@@ -74,7 +79,7 @@ def create_task(dag, activity_list, (index, activity)):
         command=command,
         params=params,
         xcom_push=True,
-        force_pull=True,
+        force_pull=force_pull,
         dag=dag)
 
 
