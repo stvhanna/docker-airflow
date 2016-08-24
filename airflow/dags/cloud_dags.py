@@ -13,7 +13,7 @@ start_date = datetime(now.year, now.month, now.day)
 
 default_args = {
     'owner': 'astronomer',
-    'depends_on_past': True,
+    'depends_on_past': False,
     'start_date': start_date,
     'email': 'greg@astronomer.io',
     'email_on_failure': False,
