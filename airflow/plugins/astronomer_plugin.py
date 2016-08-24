@@ -300,11 +300,8 @@ class AstronomerMesosExecutor(BaseExecutor):
         self.task_queue.put((key, command))
 
     def sync(self):
-        logging.debug('calling astronomer executor sync method')
         while not self.result_queue.empty():
-            logging.debug('result_queue not empty, results:')
             results = self.result_queue.get()
-            logging.debug(results)
             self.change_state(*results)
 
     def end(self):
