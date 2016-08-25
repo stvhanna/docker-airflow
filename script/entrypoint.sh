@@ -16,7 +16,7 @@ fi
 
 if [ -v AIRFLOW__CORE__SQL_ALCHEMY_CONN ]; then
     # Wait for postgres then init the db.
-    if [[ "$3" == *"webserver"* ]] || [[ "$3" = *"scheduler"* ]]; then
+    if [[ "$3" == *"webserver"* ]] || [[ "$3" == *"scheduler"* ]]; then
         HOST=`echo $AIRFLOW__CORE__SQL_ALCHEMY_CONN | awk -F@ '{print $2}'`
         FORMATTED_HOST=`echo $HOST | tr ":" " "`
         CHECK_HOST="nc -z ${FORMATTED_HOST}"
