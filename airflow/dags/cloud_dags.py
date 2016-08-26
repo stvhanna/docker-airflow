@@ -9,7 +9,7 @@ import json
 import os
 
 now = datetime.utcnow() - timedelta(hours=1)
-start_date = datetime(now.year, now.month, now.day)
+start_date = datetime(now.year, now.month, now.day, now.hour)
 
 default_args = {
     'owner': 'astronomer',
