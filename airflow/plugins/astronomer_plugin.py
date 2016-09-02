@@ -163,10 +163,6 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
                 pg_env.name = "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
                 pg_env.value = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN', '')
 
-                mongo_env = command.environment.variables.add()
-                mongo_env.name = "MONGO_URL"
-                mongo_env.value = os.getenv('MONGO_URL', '')
-
                 task.command.MergeFrom(command)
                 tasks.append(task)
 
