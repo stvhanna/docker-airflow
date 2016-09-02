@@ -156,23 +156,16 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
                 container.docker.MergeFrom(docker)
                 task.container.MergeFrom(container)
 
-                # ASTRONOMER #
-                conn = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN', '')
-                # docker_cmd = "docker run -h $(hostname)
-                # -v /airflow/logs:/airflow/logs
-                # -v /var/run/docker.sock:/var/run/docker.sock
-                # -e 'AIRFLOW__CORE__SQL_ALCHEMY_CONN={conn}' astronomerio/airflow {cmd}".format(conn=conn, cmd=cmd)
-
-                # docker_cmd = re.sub('^([\w]+)', docker_run, cmd)
-                # ASTRONOMER #
-
                 command = mesos_pb2.CommandInfo()
-                # command.shell = True
                 command.value = cmd
 
-                environment = command.environment.variables.add()
-                environment.name = "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
-                environment.value = conn
+                pg_env = command.environment.variables.add()
+                pg_env.name = "AIRFLOW__CORE__SQL_ALCHEMY_CONN"
+                pg_env.value = os.getenv('AIRFLOW__CORE__SQL_ALCHEMY_CONN', '')
+
+                mongo_env = command.environment.variables.add()
+                mongo_env.name = "MONGO_URL"
+                mongo_env.value = os.getenv('MONGO_URL', '')
 
                 task.command.MergeFrom(command)
                 tasks.append(task)
