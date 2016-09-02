@@ -1,12 +1,10 @@
 from airflow import DAG
-from airflow.operators.docker_operator import DockerOperator
 from datetime import datetime, timedelta
 from fn.func import F
-import ast
 import stringcase as case
 import pymongo
-import json
 import os
+from util.docker import create_linked_docker_operator
 
 now = datetime.utcnow() - timedelta(hours=1)
 start_date = datetime(now.year, now.month, now.day, now.hour)
@@ -21,66 +19,6 @@ default_args = {
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
 }
-
-# Pass some env vars through.
-env = {
-    'AWS_ACCESS_KEY_ID': os.getenv('AWS_ACCESS_KEY_ID', ''),
-    'AWS_SECRET_ACCESS_KEY': os.getenv('AWS_SECRET_ACCESS_KEY', ''),
-    'AWS_REGION': os.getenv('AWS_REGION', ''),
-    'AWS_S3_TEMP_BUCKET': os.getenv('AWS_S3_TEMP_BUCKET', '')
-}
-
-# Trim aries-activity- off.
-def trim_activity_name(name):
-    return name[15:]
-
-def create_task(dag, activity_list, (index, activity)):
-    # Get the previous tasks id.
-    # This is to mimic original aries functionality.
-    # This will probably be replaced with using sensors.
-    previous_task = activity_list[index - 1] if index > 0 else None
-    previous_task_id = (
-            '{index}_{name}'.format(index=index-1, name=trim_activity_name(previous_task['name'])) if previous_task
-            else '')
-
-    # Template out a command.
-    command = """
-        '{{ task_instance.xcom_pull(task_ids=params.previous_task_id) }}'
-        '{{ params.config }}'
-        '{{ ts }}'
-    """
-
-    # Get config.
-    config = json.dumps(activity['config'] if 'config' in activity else {})
-
-    # The params for the command.
-    params = { 'config': config, 'previous_task_id': previous_task_id }
-
-    # Get the activity name.
-    activity_name = trim_activity_name(activity['name'])
-
-    # Create task id.
-    task_id = '{index}_{name}'.format(
-            index=index,
-            name=trim_activity_name(activity['name']))
-
-    # Prefix with our docker hub username.
-    image_name = 'astronomerio/' + activity_name
-
-    # Force pull in prod, use local in dev.
-    force_pull = ast.literal_eval(os.getenv('FORCE_PULL_TASK_IMAGES', 'True'))
-
-    # Return a new docker operator with our command.
-    return DockerOperator(
-        task_id=task_id,
-        image=image_name,
-        environment=env,
-        command=command,
-        params=params,
-        xcom_push=True,
-        force_pull=force_pull,
-        dag=dag)
-
 
 # Get mongo url.
 mongo_url = os.getenv('MONGO_URL', '')
@@ -126,7 +64,7 @@ for workflow in workflows:
     activity_list = workflow['activityList']
 
     # List to hold activities to setup dependencies after creation.
-    tasks = map(F(create_task, dag, activity_list), enumerate(activity_list))
+    tasks = map(F(create_linked_docker_operator, dag, activity_list, ''), enumerate(activity_list))
 
     # Loop through tasks and set dependencies.
     # TODO: Support `dependsOn` for full blown dags in mongo.
