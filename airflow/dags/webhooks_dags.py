@@ -65,15 +65,15 @@ for webhook in webhooks:
     # Prefix to search for.
     prefix = 'webhooks/{{ params.webhook_id }}/{{ ts }}/{{ ds }}'
 
-    # Start off with a sensor.
+    # Check if we have any files.  Probes for a minute, every 15 seconds.
     sensor = AstronomerS3KeySensor(
         task_id='s3_webhooks_sensor',
         bucket_name=os.getenv('AWS_S3_TEMP_BUCKET'),
         bucket_key=prefix,
         params=sensor_params,
         soft_fail=True,
-        poke_interval=30,
-        timeout=900,
+        poke_interval=15,
+        timeout=60,
         dag=dag)
 
     sensor.set_upstream(dummy)
@@ -104,5 +104,3 @@ for webhook in webhooks:
         if (i == 0): current.set_upstream(merge)
         else: current.set_upstream(tasks[i - 1])
 
-client.close()
-print('Finished exporting Webhooks DAG\'s.')
