@@ -35,7 +35,7 @@ RUN set -ex \
     && echo "deb http://repos.mesosphere.com/ubuntu vivid main" > /etc/apt/sources.list.d/mesosphere.list \
     && echo "deb http://http.debian.net/debian jessie-backports main" > /etc/apt/sources.list.d/backports.list \
     && apt-get update -yqq \
-    && apt-get install -yqq --no-install-recommends --fix-missing \
+    && apt-get install -yqq --no-install-recommends \
         $buildDeps \
         apt-utils \
         curl \
