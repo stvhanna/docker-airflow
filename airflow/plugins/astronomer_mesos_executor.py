@@ -1,5 +1,3 @@
-import os
-import re
 from airflow.plugins_manager import AirflowPlugin
 
 from future import standard_library
@@ -17,7 +15,6 @@ from airflow.executors.base_executor import BaseExecutor
 from airflow.settings import Session
 from airflow.utils.state import State
 from airflow.exceptions import AirflowException
-
 
 DEFAULT_FRAMEWORK_NAME = 'Airflow'
 FRAMEWORK_CONNID_PREFIX = 'mesos_framework_'
@@ -138,7 +135,6 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
 
                 container = mesos_pb2.ContainerInfo()
                 container.type = 1 # mesos_pb2.ContainerInfo.Type.DOCKER
-
                 volume = container.volumes.add()
                 volume.host_path = "/airflow/logs"
                 volume.container_path = "/airflow/logs"
@@ -298,6 +294,6 @@ class AstronomerMesosExecutor(BaseExecutor):
         self.mesos_driver.stop()
 
 
-class AstronomerPlugin(AirflowPlugin):
-    name = 'astronomer_plugin'
+class AstronomerMesosExecutorPlugin(AirflowPlugin):
+    name = 'astronomer_mesos_executor_plugin'
     executors = [AstronomerMesosExecutor]
