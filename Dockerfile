@@ -70,7 +70,7 @@ RUN set -ex \
     && pip install bcrypt>=2.0.0 \
     && pip install flask-bcrypt>=0.7.1 \
 
-    && pip install git+https://github.com/astronomerio/incubator-airflow@logging-fix#egg=incubator-airflow \
+    && pip install git+https://github.com/astronomerio/incubator-airflow@astronomer-fixes#egg=incubator-airflow \
     # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
 
