@@ -1,5 +1,3 @@
-from airflow.plugins_manager import AirflowPlugin
-
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -299,8 +297,3 @@ class AstronomerMesosExecutor(BaseExecutor):
     def end(self):
         self.task_queue.join()
         self.mesos_driver.stop()
-
-
-class AstronomerMesosExecutorPlugin(AirflowPlugin):
-    name = 'astronomer_mesos_executor_plugin'
-    executors = [AstronomerMesosExecutor]

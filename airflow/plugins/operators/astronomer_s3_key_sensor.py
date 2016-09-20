@@ -1,8 +1,6 @@
 import os
 import logging
 
-from airflow.plugins_manager import AirflowPlugin
-
 from airflow.operators.sensors import BaseSensorOperator
 from airflow.hooks import S3Hook
 from airflow.utils.decorators import apply_defaults
@@ -34,8 +32,3 @@ class AstronomerS3KeySensor(BaseSensorOperator):
         return hook.check_for_prefix(prefix=self.bucket_key,
                                      bucket_name=self.bucket_name,
                                      delimiter='/')
-
-
-class AstronomerS3KeySensorPlugin(AirflowPlugin):
-    name = 'astronomer_s3_key_sensor_plugin'
-    operators = [AstronomerS3KeySensor]
