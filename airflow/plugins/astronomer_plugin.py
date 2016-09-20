@@ -183,15 +183,22 @@ class AirflowMesosScheduler(mesos.interface.Scheduler):
             logging.warn("Unrecognised task key %s" % update.task_id.value)
             return
 
-        if update.state == mesos_pb2.TASK_FINISHED:
-            self.result_queue.put((key, State.SUCCESS))
-            self.task_queue.task_done()
+        #XXX: Sometimes we get into a situation where task_queue.task_done()
+        # throws errors. Could be due to some unhandled event we should be taking
+        # care of somewhere else. Less likely, could be due to an issue where Queue.put isn't
+        # properly locking.  Either way, just ignore for now.
+        try:
+            if update.state == mesos_pb2.TASK_FINISHED:
+                self.result_queue.put((key, State.SUCCESS))
+                self.task_queue.task_done()
 
-        if update.state == mesos_pb2.TASK_LOST or \
-           update.state == mesos_pb2.TASK_KILLED or \
-           update.state == mesos_pb2.TASK_FAILED:
-            self.result_queue.put((key, State.FAILED))
-            self.task_queue.task_done()
+            if update.state == mesos_pb2.TASK_LOST or \
+               update.state == mesos_pb2.TASK_KILLED or \
+               update.state == mesos_pb2.TASK_FAILED:
+                self.result_queue.put((key, State.FAILED))
+                self.task_queue.task_done()
+        except ValueError:
+            logging.warn("Error marking task_done")
 
 
 class AstronomerMesosExecutor(BaseExecutor):
