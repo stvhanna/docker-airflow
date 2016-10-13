@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM debian:8.6
 MAINTAINER schnie <greg@astronomer.io>
 
 # Never prompts the user for choices on installation/configuration of packages
@@ -44,7 +44,7 @@ RUN set -ex \
         dnsutils \
         mesos \
         supervisor \
-    && apt-get install -yqq -t jessie-backports python-requests libpq-dev \
+    && apt-get install -yqq -t jessie-backports python-requests cython libpq-dev \
     && sed -i 's/^# en_US.UTF-8 UTF-8$/en_US.UTF-8 UTF-8/g' /etc/locale.gen \
     && locale-gen \
     && update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 \
