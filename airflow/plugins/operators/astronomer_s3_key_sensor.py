@@ -26,6 +26,8 @@ class AstronomerS3KeySensor(BaseSensorOperator):
         self.bucket_key = bucket_key
 
     def poke(self, context):
+        logging.info('S3 CONNECTION:')
+        logging.info(os.getenv(CONN_ENV_PREFIX + 'S3_CONNECTION'))
         hook = S3Hook(s3_conn_id='S3_CONNECTION')
         full_url = "s3://" + self.bucket_name + "/" + self.bucket_key
         logging.info('Poking for key : {full_url}'.format(**locals()))
