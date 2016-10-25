@@ -6,16 +6,17 @@ CONN_ATTEMPTS=50
 if [ -v AIRFLOW_POSTGRES_HOST ] && [ -v AIRFLOW_POSTGRES_USER ] && [ -v AIRFLOW_POSTGRES_PASSWORD ]; then
     echo "Querying for postgres host SRV record (${AIRFLOW_POSTGRES_HOST}) ..."
 
-    DNS=`dig $AIRFLOW_POSTGRES_HOST +noall +answer +short -t SRV`
+    DNS=""
+    DIG="dig $AIRFLOW_POSTGRES_HOST +noall +answer +short -t SRV"
 
-    while [ -z "$DNS" ]; do          
+    while DNS=`$DIG` && [ -z "$DNS" ]; do
         i=`expr $i + 1`;         
         if [ $i -ge $CONN_ATTEMPTS ]; then                 
             echo "$(date) - DNS not diggable, giving up";                 
             exit 1;         
         fi;         
         echo "Postgres HOST DNS entry was not found yet Retrying... $i/$CONN_ATTEMPTS";
-        DNS=`dig $AIRFLOW_POSTGRES_HOST +noall +answer +short -t SRV`
+        
         sleep 1
     done
 
