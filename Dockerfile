@@ -60,6 +60,7 @@ RUN set -ex \
     && pip install stringcase==1.0.6 \
     && pip install fn==0.4.3 \
     && pip install docker-py==1.8.1 \
+    && pip install future==0.15.2 \
 
     # Should be installed using airlow extra requirements
     # via pip install airflow[s3,postgres], but can't get it to work
