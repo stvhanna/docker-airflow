@@ -1,5 +1,5 @@
 from airflow import DAG
-from airflow.contrib.operators import AstronomerS3KeySensor
+from airflow.operators import AstronomerS3KeySensor
 from airflow.operators import DummyOperator
 from datetime import datetime, timedelta
 from fn.func import F
