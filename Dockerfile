@@ -84,7 +84,7 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-# Set python path so airfow can find pip installed packages.
+# Set python path so airflow can find pip installed packages.
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python2.7/site-packages/
 
 # Add supervisor configs.
