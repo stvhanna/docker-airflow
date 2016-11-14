@@ -61,16 +61,7 @@ RUN set -ex \
     && pip install fn==0.4.3 \
     && pip install docker-py==1.8.1 \
 
-    # Should be installed using airlow extra requirements
-    # via pip install airflow[s3,postgres], but can't get it to work
-    # with editable install. These are pulled from airflow setup.py.
-    && pip install psycopg2>=2.6 \
-    && pip install boto>=2.36.0 \
-    && pip install filechunkio>=1.6 \
-    && pip install bcrypt>=2.0.0 \
-    && pip install flask-bcrypt>=0.7.1 \
-
-    && pip install git+https://github.com/astronomerio/incubator-airflow@1.7.1.4#egg=incubator-airflow \
+    && pip install git+https://github.com/astronomerio/incubator-airflow@1.7.1.4#egg=incubator-airflow[s3,postgres,password] \
     # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
 
