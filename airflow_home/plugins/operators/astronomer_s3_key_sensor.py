@@ -33,3 +33,25 @@ class AstronomerS3KeySensor(BaseSensorOperator):
         return hook.check_for_prefix(prefix=self.bucket_key,
                                      bucket_name=self.bucket_name,
                                      delimiter='/')
+
+
+class AstronomerS3GetKeyAction(BaseSensorOperator):
+    """
+    Grab one or more files from S3 keys matching a wildcard regex.
+    """
+    template_fields = ('bucket_key', 'bucket_name')
+
+    @apply_defaults
+    def __init__(self, bucket_key, bucket_name, *args, **kwargs):
+        super(AstronomerS3GetKeyAction, self).__init__(*args, **kwargs)
+        self.bucket_name = bucket_name
+        self.bucket_key = bucket_key
+
+    def poke(self, context):
+        hook = S3Hook(s3_conn_id='S3_CONNECTION')
+        key = hook.get_wildcard_key(
+            wildcard_key=self.bucket_key,
+            bucket_name=self.bucket_name,
+            delimiter='/',
+        )
+        return key
