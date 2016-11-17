@@ -11,6 +11,7 @@ from airflow.operators import (
 )
 from fn.func import F
 import pymongo
+import stringcase
 
 from util.docker import create_linked_docker_operator
 
@@ -39,15 +40,17 @@ print('Found {} ftp_configs.'.format(ftp_configs.count()))
 # one FTP config per workflow and each customer can have zero or more workflows
 for ftp_config in ftp_configs:
     id_ = ftp_config['_id']
+    config_name = stringcase.snakecase(ftp_config['name'].lower())
     path = ftp_config['path']
     schedule = ftp_config['schedule']
     poke_interval = int(ftp_config['pokeInterval'])
     timeout = int(ftp_config['timeout'])
     activity_list = ftp_config['activityList']
 
-    print('Building DAG', id_)
+    dag_name = '{config_name}__ftp__{id}'.format(config_name=config_name, id=id_)
+    print('Building DAG', dag_name)
 
-    dag = DAG(id_, default_args=default_args, schedule_interval=schedule)
+    dag = DAG(dag_name, default_args=default_args, schedule_interval=schedule)
     globals()[id_] = dag  # TODO: may be unnecessary
 
     op_0_dummy = DummyOperator(task_id='start', dag=dag)
