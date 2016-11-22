@@ -16,7 +16,7 @@ import stringcase
 from util.docker import create_linked_docker_operator
 
 MONGO_URL = os.getenv('MONGO_URL', '')
-S3_BUCKET = 'astronomer-ftp'  # TODO: put this in an env var in infra
+S3_BUCKET = os.getenv('AWS_S3_FTP_BUCKET')
 
 now = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 start_date = datetime.datetime(now.year, now.month, now.day, now.hour)
