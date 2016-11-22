@@ -7,7 +7,7 @@ ENV TERM linux
 
 # Airflow
 ARG AIRFLOW_VERSION=1.7.1.3
-ENV AIRFLOW_HOME /astro_airflow
+ENV AIRFLOW_HOME /airflow_home
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -85,7 +85,7 @@ ADD config /etc/supervisor/conf.d/
 ADD script/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
 
 # Set airflow home.
-ADD astro_airflow ${AIRFLOW_HOME}/
+ADD airflow_home ${AIRFLOW_HOME}/
 
 EXPOSE 8080 5555 8793
 WORKDIR ${AIRFLOW_HOME}
