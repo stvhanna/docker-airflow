@@ -62,7 +62,7 @@ def create_linked_docker_operator(dag, activity_list, initial_task_id, (index, a
             name=trim_activity_name(activity['name']))
 
     # check for vpnConnection. Must run privileged if a tunnel is needed
-    privileged = True if 'vpnConnection' in config else False
+    privileged = 'vpnConnection' in config.get('connection', {})
 
     # Return the operator.
     return create_docker_operator(dag, task_id, command, params, activity_name, privileged)
