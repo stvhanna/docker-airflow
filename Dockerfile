@@ -61,7 +61,7 @@ RUN set -ex \
     && pip install fn==0.4.3 \
     && pip install docker-py==1.8.1 \
 
-    && pip install git+https://github.com/astronomerio/incubator-airflow@1.7.1.4#egg=incubator-airflow[s3,postgres,password] \
+    && pip install git+https://github.com/astronomerio/incubator-airflow@astronomer-fixes#egg=incubator-airflow[s3,postgres,password] \
     # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
 
