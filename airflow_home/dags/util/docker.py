@@ -8,7 +8,7 @@ from airflow.operators.docker_operator import DockerOperator
 def trim_activity_name(name):
     return name[15:]
 
-def create_docker_operator(dag, task_id, cmd, params, image_name):
+def create_docker_operator(dag, task_id, cmd, params, image_name, privileged=False):
     # Pass some env vars through.
     env = {
         'AWS_ACCESS_KEY_ID': os.getenv('AWS_ACCESS_KEY_ID', ''),
@@ -25,6 +25,7 @@ def create_docker_operator(dag, task_id, cmd, params, image_name):
         task_id=task_id,
         image='astronomerio/{image_name}'.format(image_name=image_name),
         environment=env,
+        privileged=privileged,
         command=cmd,
         params=params,
         xcom_push=True,
@@ -60,5 +61,8 @@ def create_linked_docker_operator(dag, activity_list, initial_task_id, (index, a
             index=index,
             name=trim_activity_name(activity['name']))
 
+    # check for vpnConnection. Must run privileged if a tunnel is needed
+    privileged = 'vpnConnection' in config.get('connection', {})
+
     # Return the operator.
-    return create_docker_operator(dag, task_id, command, params, activity_name)
+    return create_docker_operator(dag, task_id, command, params, activity_name, privileged)
