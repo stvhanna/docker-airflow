@@ -51,10 +51,11 @@ def create_linked_docker_operator(dag, activity_list, initial_task_id, (index, a
     """
 
     # Get config.
-    config = json.dumps(activity['config'] if 'config' in activity else {})
+    config = activity['config'] if 'config' in activity else {}
+    config_str = json.dumps(config)
 
     # The params for the command.
-    params = {'config': config, 'prev_task_id': prev_task_id}
+    params = {'config': config_str, 'prev_task_id': prev_task_id}
 
     # Get the activity name.
     activity_name = trim_activity_name(activity['name'])
