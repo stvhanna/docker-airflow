@@ -60,7 +60,7 @@ for webhook in webhooks:
         dag=dag)
 
     # The params for the sensor.
-    sensor_params = { 'webhook_id': webhook_id }
+    sensor_params = {'webhook_id': webhook_id}
 
     # Prefix to search for.
     prefix = 'webhooks/{{ params.webhook_id }}/{{ ts }}/{{ ds }}'
@@ -85,7 +85,7 @@ for webhook in webhooks:
         '{{ ts }}'
     """
     # Merge command params.
-    merge_params = { 'webhook_id': webhook_id, 'bucket': os.getenv('AWS_S3_TEMP_BUCKET') }
+    merge_params = {'webhook_id': webhook_id, 'bucket': os.getenv('AWS_S3_TEMP_BUCKET')}
 
     # Create docker container operator for s3_merge_source.
     merge = create_docker_operator(dag, 's3_merge_source', merge_command, merge_params, 's3-merge-source')
@@ -101,6 +101,7 @@ for webhook in webhooks:
     # Loop through tasks and set dependencies.
     # TODO: Support `dependsOn` for full blown dags in mongo.
     for i, current in enumerate(tasks):
-        if (i == 0): current.set_upstream(merge)
-        else: current.set_upstream(tasks[i - 1])
-
+        if (i == 0):
+            current.set_upstream(merge)
+        else:
+            current.set_upstream(tasks[i - 1])

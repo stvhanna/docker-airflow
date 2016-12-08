@@ -4,10 +4,10 @@ Airflow docker container
 
 ## Code Quality
 
-To lint, run pycodestyle (formerly pep8) at project root:
+To lint, run pycodestyle (formerly pep8) within container:
 
 ```
-pycodestyle .
+make lint
 ```
 
 ## Tests
@@ -15,5 +15,5 @@ pycodestyle .
 Run nose2 at the project root:
 
 ```
-nose2
+make test
 ```

@@ -12,15 +12,16 @@ aws_key = os.getenv('AWS_ACCESS_KEY_ID', '')
 aws_secret = quote_plus(os.getenv('AWS_SECRET_ACCESS_KEY', ''))
 os.environ[CONN_ENV_PREFIX + 'S3_CONNECTION'] = 's3://{aws_key}:{aws_secret}@S3'.format(**locals())
 
+
 class AstronomerS3KeySensor(BaseSensorOperator):
 
     template_fields = ('bucket_key', 'bucket_name')
 
     @apply_defaults
     def __init__(self,
-            bucket_key,
-            bucket_name,
-            *args, **kwargs):
+                 bucket_key,
+                 bucket_name,
+                 *args, **kwargs):
         super(AstronomerS3KeySensor, self).__init__(*args, **kwargs)
         self.bucket_name = bucket_name
         self.bucket_key = bucket_key
