@@ -7,7 +7,6 @@ ENV TERM linux
 
 # Airflow
 ARG AIRFLOW_VERSION=1.7.1.3
-ARG AIRFLOW_BRANCH=astronomer-fixes
 ENV AIRFLOW_HOME /airflow_home
 
 # Define en_US.
@@ -67,7 +66,7 @@ RUN set -ex \
     && pip install coverage==4.2 \
     && pip install pycodestyle==2.2.0 \
 
-    && pip install git+https://github.com/astronomerio/incubator-airflow@$AIRFLOW_BRANCH#egg=incubator-airflow[s3,postgres,password] \
+    && pip install git+https://github.com/astronomerio/incubator-airflow@astronomer-fixes#egg=incubator-airflow[s3,postgres,password] \
     # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
 
