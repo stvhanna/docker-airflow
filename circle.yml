@@ -1,6 +1,6 @@
 machine:
-	environment:
-		IMAGE_NAME: astronomerio/airflow
+  environment:
+    IMAGE_NAME: astronomerio/airflow
   services:
     - docker
 
