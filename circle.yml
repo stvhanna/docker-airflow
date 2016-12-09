@@ -33,7 +33,7 @@ deployment:
       - git clone git@github.com:astronomerio/circle-scripts.git
       - sh ./circle-scripts/deploy-docker-hub.sh
   staging:
-    branch: circleCI
+    branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       # master branch is always built with the latest tag
