@@ -9,9 +9,9 @@ dependencies:
     - docker info
     - >
       if [ -z ${CIRCLE_TAG+x} ]; then 
-        docker build --rm=false --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME; 
+        docker build --rm=false --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME .; 
       else 
-        docker build --rm=false -t $IMAGE_NAME; 
+        docker build --rm=false -t $IMAGE_NAME .; 
       fi
 
 test:
