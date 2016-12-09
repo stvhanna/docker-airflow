@@ -11,8 +11,8 @@ dependencies:
 
 test:
   override: 
-    - make lint-container
-    - make test-container
+    - make lint
+    - make test
 
 deployment:
   production:
@@ -24,6 +24,6 @@ deployment:
   staging:
     branch: master
     commands:
-      - docker build -t $IMAGE_NAME .
+      - docker build --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push $IMAGE_NAME
