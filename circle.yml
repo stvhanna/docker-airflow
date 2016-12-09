@@ -1,5 +1,6 @@
 machine:
   environment:
+    # set env var so every command can use
     IMAGE_NAME: astronomerio/airflow
   services:
     - docker
@@ -7,6 +8,8 @@ machine:
 dependencies:
   override:
     - docker info
+    # override docker build. if the build is on the master branch, pass build args so the staging branch 
+    # of incubator-airflow is used. if it's a build for a tagged release, build without overriding AIRFLOW_BRANCH
     - >
       if [ -z ${CIRCLE_TAG+x} ]; then 
         docker build --rm=false --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME .; 
@@ -24,10 +27,12 @@ deployment:
     tag: /[0-9]+(\.[0-9]+)*/
     owner: astronomerio
     commands:
+      # use a custom shell script for deploy git tagged releases to docker hub
       - git clone git@github.com:astronomerio/circle-scripts.git
       - sh ./circle-scripts/deploy-docker-hub.sh
   staging:
     branch: circleCI
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      # master branch is always built with the latest tag
       - docker push $IMAGE_NAME
