@@ -16,7 +16,8 @@ def create_docker_operator(dag, task_id, cmd, params, image_name, privileged=Fal
         'AWS_ACCESS_KEY_ID': os.getenv('AWS_ACCESS_KEY_ID', ''),
         'AWS_SECRET_ACCESS_KEY': os.getenv('AWS_SECRET_ACCESS_KEY', ''),
         'AWS_REGION': os.getenv('AWS_REGION', ''),
-        'AWS_S3_TEMP_BUCKET': os.getenv('AWS_S3_TEMP_BUCKET', '')
+        'AWS_S3_TEMP_BUCKET': os.getenv('AWS_S3_TEMP_BUCKET', ''),
+        'ARIES_REMOVE_FILES_AFTER_TASK': 'TRUE'
     }
 
     # Force pull in prod, use local in dev.
