@@ -1,0 +1,31 @@
+machine:
+  environment:
+    # set env var so every command can use
+    IMAGE_NAME: astronomerio/airflow
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build --rm=false -t $IMAGE_NAME .
+
+test:
+  override: 
+    - make lint-ci
+    - make test-ci
+
+deployment:
+  production:
+    tag: /[0-9]+(\.[0-9]+)*/
+    owner: astronomerio
+    commands:
+      - docker tag $IMAGE_NAME:latest $IMAGE_NAME:$CIRCLE_TAG
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $IMAGE_NAME:$CIRCLE_TAG
+  staging:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      # master branch is always built with the latest tag
+      - docker push $IMAGE_NAME
