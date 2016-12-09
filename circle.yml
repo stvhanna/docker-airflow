@@ -12,8 +12,10 @@ dependencies:
     # of incubator-airflow is used. if it's a build for a tagged release, build without overriding AIRFLOW_BRANCH
     - >
       if [ -z ${CIRCLE_TAG+x} ]; then 
+        # building on a branch so use staging
         docker build --rm=false --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME .; 
       else 
+        # building a tagged release
         docker build --rm=false -t $IMAGE_NAME .; 
       fi
 
