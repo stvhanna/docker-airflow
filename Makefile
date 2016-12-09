@@ -12,3 +12,9 @@ test: build
 lint: build
 	docker run $(IMAGE_NAME) pycodestyle .
 
+test-ci:
+	docker run $(IMAGE_NAME) nose2
+
+lint-ci:
+	docker run $(IMAGE_NAME) pycodestyle .
+

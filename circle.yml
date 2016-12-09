@@ -21,8 +21,8 @@ dependencies:
 
 test:
   override: 
-    - make lint
-    - make test
+    - make lint-ci
+    - make test-ci
 
 deployment:
   production:
