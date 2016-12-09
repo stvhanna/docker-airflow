@@ -1,0 +1,29 @@
+machine:
+	environment:
+		IMAGE_NAME: astronomerio/airflow
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker build --rm=false -t $IMAGE_NAME .
+
+test:
+  override: 
+    - make lint-container
+    - make test-container
+
+deployment:
+  production:
+    tag: /[0-9]+(\.[0-9]+)*/
+    owner: astronomerio
+    commands:
+      - git clone git@github.com:astronomerio/circle-scripts.git
+      - sh ./circle-scripts/deploy-docker-hub.sh
+  staging:
+    branch: master
+    commands:
+      - docker build -t $IMAGE_NAME .
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push $IMAGE_NAME
