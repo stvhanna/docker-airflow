@@ -7,7 +7,12 @@ machine:
 dependencies:
   override:
     - docker info
-    - docker build --rm=false -t $IMAGE_NAME .
+    - >
+      if [ -z ${CIRCLE_TAG+x} ]; then 
+        docker build --rm=false --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME; 
+      else 
+        docker build --rm=false -t $IMAGE_NAME; 
+      fi
 
 test:
   override: 
@@ -24,6 +29,5 @@ deployment:
   staging:
     branch: circleCI
     commands:
-      - docker build --build-arg AIRFLOW_BRANCH=astronomer-fixes-staging -t $IMAGE_NAME .
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push $IMAGE_NAME
