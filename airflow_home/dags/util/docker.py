@@ -28,6 +28,7 @@ def create_docker_operator(dag, task_id, cmd, params, image_name, privileged=Fal
         task_id=task_id,
         image='astronomerio/{image_name}'.format(image_name=image_name),
         environment=env,
+        remove=True,
         privileged=privileged,
         command=cmd,
         params=params,
