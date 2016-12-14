@@ -7,7 +7,7 @@ ENV TERM linux
 
 # Airflow
 ARG AIRFLOW_VERSION=1.7.1.3
-ENV AIRFLOW_HOME /airflow
+ENV AIRFLOW_HOME /airflow_home
 
 # Define en_US.
 ENV LANGUAGE en_US.UTF-8
@@ -60,17 +60,13 @@ RUN set -ex \
     && pip install stringcase==1.0.6 \
     && pip install fn==0.4.3 \
     && pip install docker-py==1.8.1 \
+    && pip install python-decouple==3.0 \
+    && pip install nose2==0.6.5 \
+    && pip install cov-core==1.15.0 \
+    && pip install coverage==4.2 \
+    && pip install pycodestyle==2.2.0 \
 
-    # Should be installed using airlow extra requirements
-    # via pip install airflow[s3,postgres], but can't get it to work
-    # with editable install. These are pulled from airflow setup.py.
-    && pip install psycopg2>=2.6 \
-    && pip install boto>=2.36.0 \
-    && pip install filechunkio>=1.6 \
-    && pip install bcrypt>=2.0.0 \
-    && pip install flask-bcrypt>=0.7.1 \
-
-    && pip install git+https://github.com/astronomerio/incubator-airflow@astronomer-fixes#egg=incubator-airflow \
+    && pip install git+https://github.com/astronomerio/incubator-airflow@astronomer-fixes#egg=incubator-airflow[s3,postgres,password] \
     # && pip install -e /incubator-airflow \
     # && pip install airflow==$AIRFLOW_VERSION \
 
@@ -84,7 +80,7 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-# Set python path so airfow can find pip installed packages.
+# Set python path so airflow can find pip installed packages.
 ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python2.7/site-packages/
 
 # Add supervisor configs.
@@ -94,7 +90,7 @@ ADD config /etc/supervisor/conf.d/
 ADD script/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
 
 # Set airflow home.
-ADD airflow ${AIRFLOW_HOME}/
+ADD airflow_home ${AIRFLOW_HOME}/
 
 EXPOSE 8080 5555 8793
 WORKDIR ${AIRFLOW_HOME}

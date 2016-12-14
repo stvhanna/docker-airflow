@@ -29,7 +29,7 @@ client = pymongo.MongoClient(mongo_url)
 
 # Query for all workflows.
 print('Querying for cloud workflows.')
-workflows = client.get_default_database().workflows.find({ '_airflow': True })
+workflows = client.get_default_database().workflows.find({'_airflow': True})
 
 print('Found {count} workflows.'.format(count=workflows.count()))
 
@@ -70,7 +70,8 @@ for workflow in workflows:
     # Loop through tasks and set dependencies.
     # TODO: Support `dependsOn` for full blown dags in mongo.
     for i, current in enumerate(tasks):
-        if (i > 0): current.set_upstream(tasks[i - 1])
+        if (i > 0):
+            current.set_upstream(tasks[i - 1])
 
 client.close()
 print('Finished exporting ETL DAG\'s.')
