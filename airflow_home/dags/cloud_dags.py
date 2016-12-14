@@ -32,6 +32,7 @@ print('Querying for cloud workflows.')
 workflows = client.get_default_database().workflows.find({'_airflow': True})
 
 print('Found {count} workflows.'.format(count=workflows.count()))
+
 for workflow in workflows:
     # Get the workflow id.
     workflow_id = workflow['_id']
