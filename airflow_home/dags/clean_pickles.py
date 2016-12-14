@@ -1,3 +1,6 @@
+# This is used to clear out old dag_pickles to prevent our postgres
+# volume from running out of space with unnecessary pickles.
+
 # Airflow 1.7.x requires DAG to be imported to run the file.
 from airflow import DAG, models, settings
 from datetime import datetime, timedelta
