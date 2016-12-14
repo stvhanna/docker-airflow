@@ -2,13 +2,16 @@
 FTP content ingestion via S3 bucket wildcard key into Airflow.
 """
 
+from urllib import quote_plus
 import datetime
 import os
 
 from airflow import DAG
+from airflow.hooks.base_hook import CONN_ENV_PREFIX
 from airflow.operators import (
-    AstronomerS3GetKeyAction, AstronomerS3KeySensor, DummyOperator,
+    AstronomerS3GetKeyAction, AstronomerS3KeySensor, AstronomerS3WildcardKeySensor, DummyOperator,
 )
+
 from fn.func import F
 import pymongo
 import stringcase
@@ -16,7 +19,10 @@ import stringcase
 from util.docker import create_linked_docker_operator
 
 MONGO_URL = os.getenv('MONGO_URL', '')
-S3_BUCKET = os.getenv('AWS_S3_FTP_BUCKET')
+S3_BUCKET = os.getenv('AWS_S3_TEMP_BUCKET')
+aws_key = os.getenv('AWS_ACCESS_KEY_ID', '')
+aws_secret = quote_plus(os.getenv('AWS_SECRET_ACCESS_KEY', ''))
+os.environ[CONN_ENV_PREFIX + 'S3_CONNECTION'] = 's3://{aws_key}:{aws_secret}@S3'.format(aws_key=aws_key, aws_secret=aws_secret)
 
 now = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
 start_date = datetime.datetime(now.year, now.month, now.day, now.hour)
@@ -51,12 +57,12 @@ for ftp_config in ftp_configs:
     print('Building DAG', dag_name)
 
     dag = DAG(dag_name, default_args=default_args, schedule_interval=schedule)
-    globals()[id_] = dag  # TODO: may be unnecessary
+    globals()[id_] = dag
 
     op_0_dummy = DummyOperator(task_id='start', dag=dag)
 
-    # probe for files
-    task_1_s3_sensor = AstronomerS3KeySensor(
+    # probe for files (assumes only one matching file at a time)
+    task_1_s3_sensor = AstronomerS3WildcardKeySensor(
         task_id='s3_ftp_config_sensor',
         bucket_name=S3_BUCKET,
         bucket_key=path,
@@ -69,15 +75,13 @@ for ftp_config in ftp_configs:
 
     # grab files
     task_2_s3_get = AstronomerS3GetKeyAction(
-        task_id='s3_ftp_config_get_key',
         bucket_name=S3_BUCKET,
         bucket_key=path,
-        soft_fail=True,
-        poke_interval=poke_interval,
-        timeout=timeout,
+        xcom_push=True,
+        task_id='s3_ftp_config_get_key',
         dag=dag,
     )
-    task_2_s3_get.set_upstream(task_1_s3_sensor)
+    task_2_match = task_2_s3_get.set_upstream(task_1_s3_sensor)
 
     # schedule downstream activity dependencies
     tasks = map(
@@ -89,7 +93,5 @@ for ftp_config in ftp_configs:
             current.set_upstream(task_2_s3_get)
         else:
             current.set_upstream(tasks[i - 1])
-
-    # TODO: archive file on S3 (see my notes)
 
 client.close()
