@@ -57,7 +57,7 @@ class AstronomerS3WildcardKeySensor(BaseSensorOperator):
         self.bucket_key = bucket_key
 
     def poke(self, context):
-        hook = AstroS3Hook(s3_conn_id='S3_CONNECTION')
+        hook = S3Hook(s3_conn_id='S3_CONNECTION')
         full_url = os.path.join('s3://', self.bucket_name, self.bucket_key, '*')
         logging.info('Poking for key : {}'.format(full_url))
         return hook.check_for_wildcard_key(wildcard_key=self.bucket_key, bucket_name=self.bucket_name, delimiter='/')
