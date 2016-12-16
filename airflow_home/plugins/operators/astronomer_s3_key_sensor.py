@@ -20,7 +20,7 @@ os.environ[CONN_ENV_PREFIX + 'S3_CONNECTION'] = 's3://{aws_key}:{aws_secret}@S3'
 
 class AstronomerS3KeySensor(BaseSensorOperator):
     """
-    TODO
+    Detect an exact file path in S3.
     """
 
     template_fields = ('bucket_key', 'bucket_name')
@@ -45,7 +45,7 @@ class AstronomerS3KeySensor(BaseSensorOperator):
 
 class AstronomerS3WildcardKeySensor(BaseSensorOperator):
     """
-    TODO
+    Detect a wildcard filepath in a "directory" in S3.
     """
 
     template_fields = ('bucket_key', 'bucket_name')
