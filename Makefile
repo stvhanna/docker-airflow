@@ -16,5 +16,4 @@ test-ci:
 	docker run $(IMAGE_NAME) nose2
 
 lint-ci:
-	docker run $(IMAGE_NAME) pycodestyle .
-
+	docker run $(IMAGE_NAME) pycodestyle --exclude=airflow_home/plugins/operators/astro_s3_hook.py .
