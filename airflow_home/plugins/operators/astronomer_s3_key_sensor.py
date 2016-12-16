@@ -1,3 +1,4 @@
+import json
 import os
 import os.path
 import logging
@@ -89,7 +90,7 @@ class AstronomerS3GetKeyAction(BaseOperator):
         if key is not None:
             if self.xcom_push:
                 logging.info('pushing path {} to xcom'.format(key.name))
-                xcom_value = '{{\"input\": {{\"key\": \"{key}\" }} }}'.format(key=key.name)
+                xcom_value = json.dumps({'input': {'key': key.name}})
                 return xcom_value  # push to XCom
         else:
             logging.info('not pushing path to xcom')
