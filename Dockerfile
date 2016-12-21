@@ -86,12 +86,12 @@ ENV PYTHONPATH=${PYTHONPATH}:/usr/lib/python2.7/site-packages/
 # Add supervisor configs.
 ADD config /etc/supervisor/conf.d/
 
-# Add entrypoint script.
-ADD script/entrypoint.sh ${AIRFLOW_HOME}/entrypoint.sh
+# Add scripts.
+ADD script script
 
 # Set airflow home.
 ADD airflow_home ${AIRFLOW_HOME}/
 
 EXPOSE 8080 5555 8793
 WORKDIR ${AIRFLOW_HOME}
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/script/entrypoint.sh"]
