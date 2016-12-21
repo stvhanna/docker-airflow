@@ -5,14 +5,11 @@
 from airflow import DAG, models, settings
 from datetime import datetime, timedelta
 
-print('Cleaning old pickles')
+print('Deleting old pickles...')
 
 session = settings.Session()
-old_pickles = session.query(models.DagPickle).filter(models.DagPickle.created_dttm < datetime.now()-timedelta(hours=12)).all()
-for p in old_pickles:
-    session.delete(p)
-
+session.query(models.DagPickle).filter(models.DagPickle.created_dttm < datetime.now()-timedelta(hours=12)).delete()
 session.commit()
 session.close()
 
-print('Pickles cleaned')
+print('Deleted old pickles!')
