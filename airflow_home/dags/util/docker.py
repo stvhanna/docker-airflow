@@ -34,7 +34,8 @@ def create_docker_operator(dag, task_id, cmd, params, image_name, privileged=Fal
         params=params,
         xcom_push=True,
         force_pull=force_pull,
-        dag=dag)
+        dag=dag,
+        volumes=['/var/log/filebeat:/usr/local/src/log'])
 
 
 def create_linked_docker_operator(dag, activity_list, initial_task_id, (index, activity)):
